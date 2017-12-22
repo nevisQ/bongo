@@ -9,14 +9,14 @@ import (
 )
 
 type Parent struct {
-	DocumentBase `bson:",inline"`
-	Bar          string
-	Number       int
-	FooBar       string
-	Children     []ChildRef
-	Child        ChildRef
-	ChildProp    string `bson:"childProp"`
-	diffTracker  *DiffTracker
+	DocumentBase       `bson:",inline"`
+	Bar         string
+	Number      int
+	FooBar      string
+	Children    []ChildRef
+	Child       ChildRef
+	ChildProp   string `bson:"childProp"`
+	diffTracker *DiffTracker
 }
 
 func (f *Parent) GetDiffTracker() *DiffTracker {
@@ -29,12 +29,12 @@ func (f *Parent) GetDiffTracker() *DiffTracker {
 }
 
 type Child struct {
-	DocumentBase `bson:",inline"`
-	ParentId     bson.ObjectId `bson:",omitempty"`
-	Name         string
-	SubChild     SubChildRef `bson:"subChild"`
-	ChildProp    string
-	diffTracker  *DiffTracker
+	DocumentBase            `bson:",inline"`
+	ParentId    interface{} `bson:",omitempty"`
+	Name        string
+	SubChild    SubChildRef `bson:"subChild"`
+	ChildProp   string
+	diffTracker *DiffTracker
 }
 
 func (c *Child) GetCascade(collection *Collection) []*CascadeConfig {
@@ -107,8 +107,8 @@ func (f *Child) GetDiffTracker() *DiffTracker {
 
 type SubChild struct {
 	DocumentBase `bson:",inline"`
-	Foo          string
-	ChildId      bson.ObjectId
+	Foo     string
+	ChildId interface{}
 }
 
 func (c *SubChild) GetCascade(collection *Collection) []*CascadeConfig {
@@ -134,12 +134,12 @@ func (c *SubChild) GetCascade(collection *Collection) []*CascadeConfig {
 }
 
 type SubChildRef struct {
-	Id  bson.ObjectId `bson:"_id,omitempty"`
+	Id  interface{} `bson:"_id,omitempty"`
 	Foo string
 }
 
 type ChildRef struct {
-	Id       bson.ObjectId `bson:"_id,omitempty"`
+	Id       interface{} `bson:"_id,omitempty"`
 	Name     string
 	SubChild SubChildRef
 }
@@ -186,9 +186,9 @@ func TestCascade(t *testing.T) {
 		collection.FindById(parent.Id, newParent)
 
 		So(newParent.Child.Name, ShouldEqual, "Foo McGoo")
-		So(newParent.Child.Id.Hex(), ShouldEqual, child.Id.Hex())
+		So(newParent.Child.Id, ShouldEqual, child.Id)
 		So(newParent.Children[0].Name, ShouldEqual, "Foo McGoo")
-		So(newParent.Children[0].Id.Hex(), ShouldEqual, child.Id.Hex())
+		So(newParent.Children[0].Id, ShouldEqual, child.Id)
 
 		// No through prop should populate directly o the parent
 		So(newParent.ChildProp, ShouldEqual, "Doop McGoop")
@@ -216,9 +216,9 @@ func TestCascade(t *testing.T) {
 		collection.FindById(parent2.Id, newParent2)
 		So(newParent2.ChildProp, ShouldEqual, "Doop McGoop")
 		So(newParent2.Child.Name, ShouldEqual, "Foo McGoo")
-		So(newParent2.Child.Id.Hex(), ShouldEqual, child.Id.Hex())
+		So(newParent2.Child.Id, ShouldEqual, child.Id)
 		So(newParent2.Children[0].Name, ShouldEqual, "Foo McGoo")
-		So(newParent2.Children[0].Id.Hex(), ShouldEqual, child.Id.Hex())
+		So(newParent2.Children[0].Id, ShouldEqual, child.Id)
 
 		// Make a new sub child, save it, and it should cascade to the child AND the parent
 		subChild := &SubChild{
@@ -236,7 +236,7 @@ func TestCascade(t *testing.T) {
 		newParent3 := &Parent{}
 		collection.FindById(parent2.Id, newParent3)
 		So(newParent3.Child.SubChild.Foo, ShouldEqual, "MySubChild")
-		So(newParent3.Child.SubChild.Id.Hex(), ShouldEqual, subChild.Id.Hex())
+		So(newParent3.Child.SubChild.Id, ShouldEqual, subChild.Id)
 
 		newParent4 := &Parent{}
 		err = childCollection.DeleteDocument(child)

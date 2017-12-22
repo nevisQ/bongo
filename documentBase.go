@@ -1,14 +1,17 @@
 package bongo
 
 import (
-	"gopkg.in/mgo.v2/bson"
 	"time"
 )
 
+type Validater interface {
+	Valid() bool
+}
+
 type DocumentBase struct {
-	Id       bson.ObjectId `bson:"_id,omitempty" json:"_id"`
-	Created  time.Time     `bson:"_created" json:"_created"`
-	Modified time.Time     `bson:"_modified" json:"_modified"`
+	Id       interface{} `bson:"_id,omitempty" json:"_id"`
+	Created  time.Time   `bson:"_created" json:"_created"`
+	Modified time.Time   `bson:"_modified" json:"_modified"`
 
 	// We want this to default to false without any work. So this will be the opposite of isNew. We want it to be new unless set to existing
 	exists bool
@@ -25,12 +28,12 @@ func (d *DocumentBase) IsNew() bool {
 }
 
 // Satisfy the document interface
-func (d *DocumentBase) GetId() bson.ObjectId {
+func (d *DocumentBase) GetId() interface{} {
 	return d.Id
 }
 
 // Sets the ID for the document
-func (d *DocumentBase) SetId(id bson.ObjectId) {
+func (d *DocumentBase) SetId(id interface{}) {
 	d.Id = id
 }
 

@@ -10,7 +10,7 @@ func ValidateRequired(val interface{}) bool {
 	return valueOf.Interface() != reflect.Zero(valueOf.Type()).Interface()
 }
 
-func ValidateMongoIdRef(id bson.ObjectId, collection *Collection) bool {
+func ValidateMongoIdRef(id interface{}, collection *Collection) bool {
 	count, err := collection.Collection().Find(bson.M{"_id": id}).Count()
 
 	if err != nil || count <= 0 {

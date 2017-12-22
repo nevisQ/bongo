@@ -36,20 +36,30 @@ func (d *DocumentBase) SetId(id bson.ObjectId) {
 
 // Set's the created date
 func (d *DocumentBase) SetCreated(t time.Time) {
-	d.Created = t
+	d.Created = &t
 }
 
 // Get the created date
 func (d *DocumentBase) GetCreated() time.Time {
-	return d.Created
+
+	if d.Created == nil {
+		return time.Time{}
+	}
+
+	return *d.Created
 }
 
 // Sets the modified date
 func (d *DocumentBase) SetModified(t time.Time) {
-	d.Modified = t
+	d.Modified = &t
 }
 
 // Get's the modified date
 func (d *DocumentBase) GetModified() time.Time {
-	return d.Modified
+
+	if d.Modified == nil {
+		return time.Time{}
+	}
+
+	return *d.Modified
 }

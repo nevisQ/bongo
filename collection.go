@@ -49,8 +49,8 @@ type TimeModifiedTracker interface {
 }
 
 type Document interface {
-	GetId() bson.ObjectId
-	SetId(bson.ObjectId)
+	GetId() interface{}
+	SetId(interface{})
 }
 
 type CascadingDocument interface {
@@ -147,12 +147,17 @@ func (c *Collection) Save(doc Document) error {
 	go CascadeSave(c, doc)
 
 	id := doc.GetId()
+	invalidId := id == nil
 
-	if !isNew && !id.Valid() {
+	if validatable, hasValidator := id.(Validater); !invalidId && hasValidator {
+		invalidId = !validatable.Valid()
+	}
+
+	if !isNew && invalidId {
 		return errors.New("New tracker says this document isn't new but there is no valid Id field")
 	}
 
-	if isNew && !id.Valid() {
+	if isNew && invalidId {
 		// Generate an Id
 		id = bson.NewObjectId()
 		doc.SetId(id)
@@ -179,7 +184,7 @@ func (c *Collection) Save(doc Document) error {
 	return nil
 }
 
-func (c *Collection) FindById(id bson.ObjectId, doc interface{}) error {
+func (c *Collection) FindById(id interface{}, doc interface{}) error {
 
 	err := c.Collection().FindId(id).One(doc)
 

@@ -7,8 +7,8 @@ import (
 
 type DocumentBase struct {
 	Id       bson.ObjectId `bson:"_id,omitempty" json:"_id"`
-	Created  time.Time     `bson:"_created" json:"_created"`
-	Modified time.Time     `bson:"_modified" json:"_modified"`
+	Created  *time.Time     `bson:"_created" json:"_created"`
+	Modified *time.Time     `bson:"_modified" json:"_modified"`
 
 	// We want this to default to false without any work. So this will be the opposite of isNew. We want it to be new unless set to existing
 	exists bool
@@ -36,20 +36,30 @@ func (d *DocumentBase) SetId(id bson.ObjectId) {
 
 // Set's the created date
 func (d *DocumentBase) SetCreated(t time.Time) {
-	d.Created = t
+	d.Created = &t
 }
 
 // Get the created date
 func (d *DocumentBase) GetCreated() time.Time {
-	return d.Created
+
+	if d.Created == nil {
+		return time.Time{}
+	}
+
+	return *d.Created
 }
 
 // Sets the modified date
 func (d *DocumentBase) SetModified(t time.Time) {
-	d.Modified = t
+	d.Modified = &t
 }
 
 // Get's the modified date
 func (d *DocumentBase) GetModified() time.Time {
-	return d.Modified
+
+	if d.Modified == nil {
+		return time.Time{}
+	}
+
+	return *d.Modified
 }

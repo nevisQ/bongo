@@ -1,0 +1,15 @@
+[[constraint]]
+  branch = "master"
+  name = "github.com/globalsign/mgo"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/go-bongo/go-dotaccess"
+
+[[constraint]]
+  name = "github.com/oleiade/reflections"
+  version = "1.0.0"
+
+[[constraint]]
+  name = "github.com/smartystreets/goconvey"
+  version = "1.6.3"
